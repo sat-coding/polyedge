@@ -3,10 +3,10 @@ import { useEffect, useState } from "react"
 
 export default function SignalsPage() {
   const [items, setItems] = useState<any[]>([])
-  useEffect(() => { fetch("http://127.0.0.1:8000/api/signals").then(r=>r.json()).then(d=>setItems(d.items||[])) }, [])
+  useEffect(() => { fetch("/backend/api/signals").then(r=>r.json()).then(d=>setItems(d.items||[])) }, [])
 
   async function run(s:any){
-    await fetch("http://127.0.0.1:8000/api/trades/execute",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({signal_id:s.id,market_id:s.market_id,question:s.question,direction:s.direction,price:0.5,size:Math.max(25,s.suggested_position||25)})})
+    await fetch("/backend/api/trades/execute",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({signal_id:s.id,market_id:s.market_id,question:s.question,direction:s.direction,price:0.5,size:Math.max(25,s.suggested_position||25)})})
     alert("Paper trade executed")
   }
 

@@ -14,11 +14,11 @@ export default function Home() {
 
   async function load() {
     const [p, s, t, n, b] = await Promise.all([
-      fetch("http://127.0.0.1:8000/api/portfolio").then(r => r.json()),
-      fetch("http://127.0.0.1:8000/api/signals").then(r => r.json()),
-      fetch("http://127.0.0.1:8000/api/trades").then(r => r.json()),
-      fetch("http://127.0.0.1:8000/api/news/refresh", { method: "POST" }).then(() => fetch("http://127.0.0.1:8000/api/news")).then(r => r.json()),
-      fetch("http://127.0.0.1:8000/api/backtest/run", { method: "POST" }).then(r => r.json()),
+      fetch("/backend/api/portfolio").then(r => r.json()),
+      fetch("/backend/api/signals").then(r => r.json()),
+      fetch("/backend/api/trades").then(r => r.json()),
+      fetch("/backend/api/news/refresh", { method: "POST" }).then(() => fetch("/backend/api/news")).then(r => r.json()),
+      fetch("/backend/api/backtest/run", { method: "POST" }).then(r => r.json()),
     ])
     setPortfolio(p)
     setSignals(s.items || [])
@@ -34,12 +34,12 @@ export default function Home() {
   }, [])
 
   async function executeFromSignal(s: any) {
-    await fetch("http://127.0.0.1:8000/api/trades/execute", {
+    await fetch("/backend/api/trades/execute", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ signal_id: s.id, market_id: s.market_id, question: s.question, direction: s.direction, price: 0.5, size: Math.max(25, s.suggested_position || 25) })
     })
-    await fetch("http://127.0.0.1:8000/api/trades/mark", { method: "POST" })
+    await fetch("/backend/api/trades/mark", { method: "POST" })
     await load()
   }
 
