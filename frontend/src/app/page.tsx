@@ -13,18 +13,18 @@ export default function Home() {
   const [equityCurve, setEquityCurve] = useState<number[]>([])
 
   async function load() {
-    const [p, s, t, n, b] = await Promise.all([
+    const [p, s, t, n, h] = await Promise.all([
       fetch("/backend/api/portfolio").then(r => r.json()),
       fetch("/backend/api/signals").then(r => r.json()),
       fetch("/backend/api/trades").then(r => r.json()),
       fetch("/backend/api/news/refresh", { method: "POST" }).then(() => fetch("/backend/api/news")).then(r => r.json()),
-      fetch("/backend/api/backtest/run", { method: "POST" }).then(r => r.json()),
+      fetch("/backend/api/portfolio/equity-history").then(r => r.json()),
     ])
     setPortfolio(p)
     setSignals(s.items || [])
     setTrades(t.items || [])
     setNews(n.items || [])
-    setEquityCurve(b.equity_curve || [])
+    setEquityCurve((h.items || []).map((x:any)=>x.equity))
   }
 
   useEffect(() => {

@@ -4,6 +4,16 @@ from app.database import get_conn
 router = APIRouter(prefix="/portfolio", tags=["portfolio"])
 
 
+def _snapshot(conn, equity: float, exposure: float, drawdown: float):
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS equity_history (id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT DEFAULT (datetime('now')), equity REAL, exposure REAL, drawdown REAL)"
+    )
+    conn.execute(
+        "INSERT INTO equity_history (equity, exposure, drawdown) VALUES (?, ?, ?)",
+        (equity, exposure, drawdown),
+    )
+
+
 @router.get("")
 def get_portfolio():
     conn = get_conn()
@@ -23,6 +33,8 @@ def get_portfolio():
     approved = sum(1 for s in signals if s.get("status") == "approved")
     rejected = sum(1 for s in signals if s.get("status") == "rejected")
 
+    _snapshot(conn, equity, exposure, drawdown)
+    conn.commit()
     conn.close()
     return {
         "cash": round(1000 - exposure * 0.1, 2),
@@ -36,3 +48,15 @@ def get_portfolio():
         "signals": {"approved": approved, "rejected": rejected},
         "open_positions": positions,
     }
+
+
+@router.get('/equity-history')
+def equity_history(limit: int = 200):
+    conn = get_conn()
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS equity_history (id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT DEFAULT (datetime('now')), equity REAL, exposure REAL, drawdown REAL)"
+    )
+    rows = [dict(r) for r in conn.execute("SELECT * FROM equity_history ORDER BY id DESC LIMIT ?", (limit,)).fetchall()]
+    conn.close()
+    rows.reverse()
+    return {"items": rows}
