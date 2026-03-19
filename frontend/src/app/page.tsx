@@ -1,0 +1,7 @@
+async function j(path: string) { const res = await fetch(`http://127.0.0.1:8000/api/${path}`, { cache: "no-store" }); if (!res.ok) return { items: [] }; return res.json(); }
+export default async function Home() {
+  const [markets, signals, portfolio] = await Promise.all([j("markets"), j("signals"), j("portfolio")]);
+  return (<main style={{ maxWidth: 1100, margin: "0 auto", padding: 24 }}><h1>PolyEdge Dashboard</h1><p style={{ color: "#888899" }}>Paper trading + AI signal overview</p><div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}><K title="Cash" v={`$${portfolio.cash ?? "-"}`} /><K title="Exposure" v={`$${portfolio.exposure ?? "-"}`} /><K title="Positions" v={`${portfolio.positions ?? "-"}`} /></div><h2>Signals</h2>{(signals.items || []).map((s: any) => <Row key={s.market_id} l={`${s.direction} · ${s.question}`} r={`EV ${s.ev_per_dollar}`} />)}<h2>Markets</h2>{(markets.items || []).slice(0, 15).map((m: any) => <Row key={m.id} l={m.question} r={`${(m.yes_price * 100).toFixed(1)}¢`} />)}</main>)
+}
+function K({ title, v }: { title: string, v: string }) { return <div style={{ border: "1px solid #1E1E2E", background: "#12121A", borderRadius: 10, padding: 12 }}><div style={{ color: "#888899" }}>{title}</div><div style={{ fontSize: 24, fontWeight: 700 }}>{v}</div></div> }
+function Row({ l, r }: { l: string, r: string }) { return <div style={{ borderBottom: "1px solid #1E1E2E", padding: "9px 0", display: "flex", justifyContent: "space-between" }}><span>{l}</span><span style={{ color: "#888899" }}>{r}</span></div> }
