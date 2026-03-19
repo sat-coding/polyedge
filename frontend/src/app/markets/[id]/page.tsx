@@ -1,1 +1,1 @@
-export default function Page(){return <main style={{padding:24}}>Coming soon</main>}
+export default function MarketDetail(){return <main style={{padding:24}}>Market detail & AI panel (phase-2 enhanced)</main>}
