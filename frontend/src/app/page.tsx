@@ -17,7 +17,7 @@ export default function Home() {
       fetch("http://127.0.0.1:8000/api/portfolio").then(r => r.json()),
       fetch("http://127.0.0.1:8000/api/signals").then(r => r.json()),
       fetch("http://127.0.0.1:8000/api/trades").then(r => r.json()),
-      fetch("http://127.0.0.1:8000/api/news").then(r => r.json()),
+      fetch("http://127.0.0.1:8000/api/news/refresh", { method: "POST" }).then(() => fetch("http://127.0.0.1:8000/api/news")).then(r => r.json()),
       fetch("http://127.0.0.1:8000/api/backtest/run", { method: "POST" }).then(r => r.json()),
     ])
     setPortfolio(p)
