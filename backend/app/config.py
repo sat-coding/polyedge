@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-5.4-2026-03-05"
     openai_fast_model: str = "gpt-5.4-mini"
     paper_trading: bool = True
+    autonomous_mode: bool = True
     bankroll: float = 1000.0
     kelly_multiplier: float = 0.25
     ev_threshold: float = 0.005

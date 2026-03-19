@@ -33,22 +33,12 @@ export default function Home() {
     return () => clearInterval(id)
   }, [])
 
-  async function executeFromSignal(s: any) {
-    await fetch("/backend/api/trades/execute", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ signal_id: s.id, market_id: s.market_id, question: s.question, direction: s.direction, price: 0.5, size: Math.max(25, s.suggested_position || 25) })
-    })
-    await fetch("/backend/api/trades/mark", { method: "POST" })
-    await load()
-  }
-
   const riskPct = Math.min(100, ((portfolio?.drawdown || 0) * 100) + ((portfolio?.exposure || 0) / 20))
 
   return (
     <main style={{ maxWidth: 1280, margin: "0 auto", padding: 24 }}>
       <h1 style={{ marginBottom: 4 }}>PolyEdge — Trading Command Center</h1>
-      <p style={{ color: "#888899", marginTop: 0 }}>Signals, risk, news impact, execution lifecycle</p>
+      <p style={{ color: "#888899", marginTop: 0 }}>Signals, risk, news impact, execution lifecycle · Autonomous paper bot active</p>
 
       <section style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 10 }}>
         <K title="Equity" value={`$${portfolio?.equity ?? "-"}`} />
@@ -74,13 +64,12 @@ export default function Home() {
 
       <section style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 14, marginTop: 14 }}>
         <Panel title="Signal Queue">
-          <Table headers={["Market", "Dir", "EV", "Kelly", "Risk", "Action"]} rows={(signals || []).slice(0, 12).map((s) => [
+          <Table headers={["Market", "Dir", "EV", "Kelly", "Risk"]} rows={(signals || []).slice(0, 12).map((s) => [
             s.question?.slice(0, 52) || s.market_id,
             chip(s.direction),
             num(s.ev_per_dollar),
             `${((s.kelly_fraction || 0) * 100).toFixed(2)}%`,
-            s.risk_check_result,
-            <button key={s.id} onClick={() => executeFromSignal(s)} style={btnPrimary}>Execute</button>
+            s.risk_check_result
           ])} />
         </Panel>
 
@@ -116,4 +105,3 @@ function Table({ headers, rows }: { headers: any[]; rows: any[][] }) {
 function num(v: any) { return Number(v || 0).toFixed(3) }
 function chip(v: string) { return <span style={{ padding: "4px 8px", borderRadius: 999, background: v?.includes("BUY") ? "#0e2a1e" : "#2a1818", color: v?.includes("BUY") ? "#00E676" : "#FF5252", fontSize: 12 }}>{v}</span> }
 
-const btnPrimary: React.CSSProperties = { background: "#6C63FF", color: "white", border: "none", borderRadius: 8, padding: "6px 10px", cursor: "pointer" }
